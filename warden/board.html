@@ -1,0 +1,112 @@
+<title>Evidence Integrity Board</title>
+<style>
+:root{--bg:#0f1216;--panel:#171b21;--panel2:#1d222a;--line:#2a313b;--ink:#e6e8ec;--dim:#9aa3af;
+  --measure:#4ea3ff;--match:#3fae74;--hunt:#d9a441;--bad:#d5604f;--crit:#c8452f;--mono:#8fb8e6;}
+:root[data-theme="light"]{--bg:#f4f2ec;--panel:#fbfaf6;--panel2:#f2efe7;--line:#e0dccf;--ink:#20242c;--dim:#5c626c;
+  --measure:#2f6ecc;--match:#2f7d54;--hunt:#9a7420;--bad:#a83d2c;--crit:#8f2f1f;--mono:#3a5a86;}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4f2ec;--panel:#fbfaf6;--panel2:#f2efe7;--line:#e0dccf;--ink:#20242c;--dim:#5c626c;
+  --measure:#2f6ecc;--match:#2f7d54;--hunt:#9a7420;--bad:#a83d2c;--crit:#8f2f1f;--mono:#3a5a86;}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);margin:0;font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px}
+.wrap{max-width:1040px;margin:0 auto;padding:26px 20px 70px}
+.mono,code{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+header{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:16px}
+.kick{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--measure)}
+h1{font-size:24px;margin:4px 0 2px;font-weight:700}
+.sub{color:var(--dim);font-size:13px;max-width:66ch}
+.run{margin-left:auto;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--dim)}
+.run b{color:var(--ink)}
+.deploy{display:inline-block;margin-top:6px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  padding:3px 9px;border-radius:20px;border:1px solid var(--match);color:var(--match)}
+.overall{margin:22px 0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;
+  display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.gauge{font-family:"IBM Plex Mono",monospace;font-size:46px;font-weight:800;line-height:1}
+.overall .txt{font-size:14px;color:var(--dim);max-width:52ch}
+.lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.lanes{grid-template-columns:1fr}}
+.lane{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;border-top:3px solid var(--line)}
+.lane.MEASURE{border-top-color:var(--measure)} .lane.MATCH{border-top-color:var(--match)} .lane.HUNT{border-top-color:var(--hunt)}
+.lane .step{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--dim)}
+.lane h3{margin:2px 0 2px;font-size:16px}
+.lane .eng{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mono)}
+.lane .h{font-family:"IBM Plex Mono",monospace;font-size:30px;font-weight:800;margin:10px 0 2px}
+.lane .stat{font-size:12.5px;color:var(--dim);margin:3px 0}
+.lane .stat b{color:var(--ink);font-family:"IBM Plex Mono",monospace}
+.queue{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.queue h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 12px;font-family:"IBM Plex Mono",monospace}
+.qrow{display:grid;grid-template-columns:1fr auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--panel2);align-items:center}
+.qrow:last-child{border-bottom:none}
+.qrow .n{font-family:"IBM Plex Mono",monospace;font-size:18px;font-weight:700}
+.qrow .n.hot{color:var(--crit)} .qrow .n.warn{color:var(--hunt)}
+.flow{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--dim);margin:14px 0 0;text-align:center}
+.flow b{color:var(--ink)}
+.btn{font:inherit;font-family:"IBM Plex Mono",monospace;font-size:12px;cursor:pointer;border:1px solid var(--line);
+  background:var(--panel2);color:var(--ink);border-radius:7px;padding:6px 12px;margin-top:8px}
+.btn:hover{border-color:var(--measure)}
+footer{margin-top:24px;color:var(--dim);font-size:11.5px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+<div class="wrap">
+<header>
+  <div>
+    <div class="kick">Sentinel Stack · measure → match → hunt</div>
+    <h1>Evidence Integrity Board</h1>
+    <div class="sub">One rollup across the three engines: is every statement anchored to atomic truth, matched to its scanned source, and substantiated by a real document?</div>
+    <div><span class="deploy" id="deploy">deploy 137.184.1.91</span></div>
+  </div>
+  <div class="run">
+    <div>run <b id="run">—</b></div><div>mode <b id="mode">—</b> · <span id="ts">—</span></div>
+    <button class="btn" onclick="reload(true)">↻ run all</button>
+  </div>
+</header>
+
+<div class="overall">
+  <div class="gauge" id="gauge">—</div>
+  <div class="txt">Overall evidence integrity — the mean of the three lane scores. Drives the action queue below. On OFFLINE snapshots this reflects sample inputs; point the stack at the <b>.91</b> lake (<code>CORPUS_DSN</code>) for the live corpus.</div>
+</div>
+
+<div class="lanes" id="lanes"></div>
+
+<div class="queue">
+  <h2>Action queue — what to work next</h2>
+  <div id="queue"></div>
+  <div class="flow">UNRESOLVED → <b>scan it</b> &nbsp;·&nbsp; PENDING_BBOX → <b>re-scan w/ coordinates</b> &nbsp;·&nbsp; OPEN_GAP → <b>corroborate or subpoena</b></div>
+</div>
+
+<footer>Each engine runs independent + non-destructive; the orchestrator only reads their reports.
+Deploy target <b>137.184.1.91 (.91)</b> — <b>104.248.69.86 (.86) is DEPRECATED</b>. Not legal advice — an infrastructure integrity tool.</footer>
+</div>
+<script>
+const FALLBACK={"orch_run":"orch_5b09875db5","generated_at":"2026-09-01","deploy_target":"137.184.1.91","mode":"OFFLINE",
+ "overall_integrity":26.4,
+ "lanes":{"MEASURE":{"engine":"citation-integrity","health":12.6,"facts":564,"anchored":71,"floating":354},
+  "MATCH":{"engine":"reanchor","health":66.7,"statements":3,"resolved_exact":2,"pending_bbox":2},
+  "HUNT":{"engine":"gap-sentinel","health":0.0,"facts":3,"open_gaps":3,"corroborated":2,"evidence_requests":1}},
+ "action_queue":{"floating_need_anchor":354,"pending_bbox_need_rescan":2,"open_gaps_need_evidence":3,"evidence_requests_to_serve":1}};
+const STEP={MEASURE:"LANE 1 · MEASURE",MATCH:"LANE 2 · MATCH",HUNT:"LANE 3 · HUNT"};
+function laneStats(k,d){
+  if(k==="MEASURE")return[["facts",d.facts],["anchored (L4)",d.anchored],["floating (L1)",d.floating]];
+  if(k==="MATCH")return[["statements",d.statements],["resolved exact",d.resolved_exact],["pending bbox",d.pending_bbox]];
+  return[["facts",d.facts],["open gaps",d.open_gaps],["corroborated",d.corroborated],["evidence reqs",d.evidence_requests]];
+}
+function render(b){
+  document.getElementById("run").textContent=b.orch_run;
+  document.getElementById("mode").textContent=b.mode;
+  document.getElementById("ts").textContent=(b.generated_at||"").slice(0,19).replace("T"," ");
+  document.getElementById("deploy").textContent="deploy "+(b.deploy_target||"137.184.1.91");
+  document.getElementById("gauge").textContent=b.overall_integrity+"%";
+  document.getElementById("lanes").innerHTML=["MEASURE","MATCH","HUNT"].map(k=>{
+    const d=b.lanes[k];
+    const rows=laneStats(k,d).map(([l,v])=>`<div class="stat"><b>${v}</b> ${l}</div>`).join("");
+    return `<div class="lane ${k}"><div class="step">${STEP[k]}</div><h3>${k[0]+k.slice(1).toLowerCase()}</h3>
+      <div class="eng">${d.engine}</div><div class="h">${d.health}%</div>${rows}</div>`;}).join("");
+  const q=b.action_queue;
+  const rows=[["Floating statements → anchor","floating_need_anchor","hot"],
+    ["Pending-bbox twins → re-scan w/ coordinates","pending_bbox_need_rescan","warn"],
+    ["Open gaps → corroborate or subpoena","open_gaps_need_evidence","hot"],
+    ["Evidence-requests → serve (CPRA/subpoena/827)","evidence_requests_to_serve","warn"]];
+  document.getElementById("queue").innerHTML=rows.map(([lab,key,cls])=>
+    `<div class="qrow"><span>${lab}</span><span class="n ${q[key]?cls:''}">${q[key]}</span></div>`).join("");
+}
+async function reload(run){try{const r=await fetch(run?"/api/run":"/api/board",{cache:"no-store"});render(await r.json());}catch(e){render(FALLBACK);}}
+reload(false);
+</script>

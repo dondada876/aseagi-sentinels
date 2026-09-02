@@ -1,0 +1,5 @@
+[
+  {"id": "SYN-1", "claim_short": "Parent offered casual access to the child on the tenth, no problem stated", "fact_date": "2024-08-10", "cert_class": "UNVERIFIED"},
+  {"id": "SYN-2", "claim_short": "A good cause report was referenced and the inspector was to be contacted", "fact_date": "2024-08-13", "cert_class": "ASSERTED_NO_QUOTE"},
+  {"id": "SYN-3", "claim_short": "An event with no communication trail that only an agency record could substantiate", "fact_date": "2024-09-06", "cert_class": "UNVERIFIED"}
+]

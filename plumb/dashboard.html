@@ -1,0 +1,145 @@
+<title>Citation Integrity Monitor</title>
+<style>
+:root{
+  --bg:#0f1216; --panel:#171b21; --panel2:#1d222a; --line:#2a313b; --ink:#e6e8ec; --dim:#9aa3af;
+  --accent:#4ea3ff; --ok:#3fae74; --warn:#d9a441; --bad:#d5604f; --crit:#c8452f; --mono:#8fb8e6;
+}
+:root[data-theme="light"]{
+  --bg:#f4f2ec; --panel:#fbfaf6; --panel2:#f2efe7; --line:#e0dccf; --ink:#20242c; --dim:#5c626c;
+  --accent:#2f6ecc; --ok:#2f7d54; --warn:#9a7420; --bad:#a83d2c; --crit:#8f2f1f; --mono:#3a5a86;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f4f2ec; --panel:#fbfaf6; --panel2:#f2efe7; --line:#e0dccf; --ink:#20242c; --dim:#5c626c;
+  --accent:#2f6ecc; --ok:#2f7d54; --warn:#9a7420; --bad:#a83d2c; --crit:#8f2f1f; --mono:#3a5a86;
+}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);margin:0;
+  font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px}
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.mono,code{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+header{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:16px}
+.kick{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:24px;margin:4px 0 2px;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--dim);font-size:13px;max-width:64ch}
+.run{margin-left:auto;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--dim)}
+.run b{color:var(--ink)}
+.headline{margin:22px 0;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--crit);
+  border-radius:12px;padding:18px 20px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.headline .big{font-size:40px;font-weight:800;font-family:"IBM Plex Mono",monospace;line-height:1}
+.headline .big.bad{color:var(--crit)}
+.headline .txt{font-size:14.5px;max-width:60ch}
+.headline .txt b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:8px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.card h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 14px;font-family:"IBM Plex Mono",monospace}
+.rung{display:grid;grid-template-columns:150px 1fr 60px;gap:10px;align-items:center;margin:7px 0}
+.rung .lab{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink)}
+.rung .track{height:16px;background:var(--panel2);border-radius:5px;overflow:hidden}
+.rung .fill{height:100%;border-radius:5px}
+.rung .n{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12px;font-variant-numeric:tabular-nums}
+.status-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pill{border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-family:"IBM Plex Mono",monospace;font-size:12px;
+  display:flex;gap:7px;align-items:center;background:var(--panel2)}
+.pill .dot{width:8px;height:8px;border-radius:50%}
+.pill .c{font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dim);padding:8px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px 8px;border-bottom:1px solid var(--panel2);vertical-align:top}
+td.num{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.doc{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mono);word-break:break-word}
+.flt{color:var(--crit);font-weight:700}
+.btn{font:inherit;font-family:"IBM Plex Mono",monospace;font-size:12px;cursor:pointer;border:1px solid var(--line);
+  background:var(--panel2);color:var(--ink);border-radius:7px;padding:6px 12px;margin-top:10px}
+.btn:hover{border-color:var(--accent)}
+.legend{font-size:11.5px;color:var(--dim);margin-top:10px;line-height:1.6}
+footer{margin-top:26px;color:var(--dim);font-size:11.5px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <div class="kick">Infra · Link-Verify Engine</div>
+    <h1>Citation-Integrity Monitor</h1>
+    <div class="sub">Is every statement cited back to atomic truth — a digital twin, a page, a 300-DPI image, a grid location? This engine classifies link integrity and never mutates a fact.</div>
+  </div>
+  <div class="run">
+    <div>run <b id="run">—</b></div>
+    <div>mode <b id="mode">—</b> · <span id="ts">—</span></div>
+    <button class="btn" onclick="reload(true)">↻ re-run</button>
+  </div>
+</header>
+
+<div class="headline">
+  <div class="big bad" id="hl-pct">—</div>
+  <div class="txt"><b id="hl-anchored">—</b> of <b id="hl-total">—</b> statements are fully citation-anchored.
+    <b class="flt" id="hl-floating">—</b> are <b>floating verbatim quotes</b> — real text with no link to a twin,
+    page, or image. Those cannot be cited in a filing until they are pinned.</div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h2>Link-integrity ladder</h2>
+    <div id="ladder"></div>
+    <div class="legend" id="ladder-legend"></div>
+  </div>
+  <div class="card">
+    <h2>Status vocabulary</h2>
+    <div class="status-row" id="statuses"></div>
+    <div class="legend">
+      <b>CERTIFIED</b> twin+page+quote+image-location · <b>VERIFIED</b> full chain, image-loc pending ·
+      <b>LINKED</b> twin but no page · <b>UNCERTIFIED</b> quote but floating · <b>UNVERIFIED</b> no anchor.
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h2>Remediation queue — documents with the most floating statements (re-scan &amp; pin first)</h2>
+  <table><thead><tr><th>Source document</th><th>Facts</th><th>Floating</th><th>Anchored</th></tr></thead>
+  <tbody id="worst"></tbody></table>
+</div>
+
+<footer>Read-only over <code>canonical_facts</code>. Findings emit in the house linter schema
+(<code>run_id · linter · target_id · rule_id · status · severity · detail</code>). Not legal advice — an infrastructure integrity tool.</footer>
+</div>
+
+<script>
+const COLORS={L0_UNANCHORED:"var(--crit)",L1_QUOTED_FLOATING:"var(--bad)",L2_TWIN_LINKED:"var(--warn)",L3_LOCATED:"var(--accent)",L4_CERTIFIABLE:"var(--ok)"};
+const SDOT={CERTIFIED:"var(--ok)",VERIFIED:"var(--ok)",LINKED:"var(--warn)",UNCERTIFIED:"var(--bad)",UNVERIFIED:"var(--crit)"};
+const FALLBACK={"mode":"OFFLINE","run_id":"cit_a9c49e0021","generated_at":"2026-09-01",
+ "totals":{"facts":564},
+ "ladder":[{"code":"L0_UNANCHORED","n":46,"pct":8.2},{"code":"L1_QUOTED_FLOATING","n":354,"pct":62.8},{"code":"L2_TWIN_LINKED","n":91,"pct":16.1},{"code":"L3_LOCATED","n":2,"pct":0.4},{"code":"L4_CERTIFIABLE","n":71,"pct":12.6}],
+ "status_counts":{"VERIFIED":71,"LINKED":93,"UNCERTIFIED":354,"UNVERIFIED":46},
+ "worst_docs":[{"source_doc":"(no source_doc)","facts":24,"floating":23,"anchored":0},{"source_doc":"240522_D22-03244_FSOD_001 (digital twin, quality 960; 86 statements)","facts":12,"floating":12,"anchored":0},{"source_doc":"250626_Hearing_D22-03244_Voice_250626_133852.txt","facts":5,"floating":5,"anchored":0},{"source_doc":"240807_to_260209_Det_Ethan_Katz_RPD_SMS_Thread.md","facts":5,"floating":5,"anchored":0},{"source_doc":"Voice 250918_114823.txt","facts":3,"floating":3,"anchored":0},{"source_doc":"HEARING_TRANSCRIPT_SEP_9_2022","facts":2,"floating":2,"anchored":0},{"source_doc":"250416_Dr_Casey_Brown_Voice_Recording.txt","facts":2,"floating":2,"anchored":0}]};
+const LABELS={L0_UNANCHORED:"no quote / no anchor",L1_QUOTED_FLOATING:"quote, no twin+page",L2_TWIN_LINKED:"twin, no page",L3_LOCATED:"twin+page, no quote",L4_CERTIFIABLE:"twin+page+quote"};
+
+function render(d){
+  document.getElementById("run").textContent=d.run_id||"—";
+  document.getElementById("mode").textContent=d.mode||"—";
+  document.getElementById("ts").textContent=(d.generated_at||"").slice(0,19).replace("T"," ");
+  const t=d.totals.facts, anchored=(d.ladder.find(r=>r.code==="L4_CERTIFIABLE")||{}).n||0;
+  const floating=(d.ladder.find(r=>r.code==="L1_QUOTED_FLOATING")||{}).n||0;
+  document.getElementById("hl-pct").textContent=Math.round(1000*anchored/t)/10+"%";
+  document.getElementById("hl-anchored").textContent=anchored;
+  document.getElementById("hl-total").textContent=t;
+  document.getElementById("hl-floating").textContent=floating;
+  document.getElementById("ladder").innerHTML=d.ladder.map(r=>{
+    const w=Math.max(2,r.pct);
+    return `<div class="rung"><span class="lab">${r.code}</span>
+      <span class="track"><span class="fill" style="width:${w}%;background:${COLORS[r.code]}"></span></span>
+      <span class="n">${r.n} · ${r.pct}%</span></div>`;}).join("");
+  document.getElementById("ladder-legend").innerHTML=d.ladder.map(r=>`<b>${r.code.split("_")[0]}</b> ${LABELS[r.code]}`).join(" &nbsp;·&nbsp; ");
+  const order=["CERTIFIED","VERIFIED","LINKED","UNCERTIFIED","UNVERIFIED"];
+  document.getElementById("statuses").innerHTML=order.filter(s=>d.status_counts[s]!=null).map(s=>
+    `<span class="pill"><span class="dot" style="background:${SDOT[s]}"></span>${s} <span class="c">${d.status_counts[s]}</span></span>`).join("");
+  document.getElementById("worst").innerHTML=(d.worst_docs||[]).map(w=>
+    `<tr><td class="doc">${w.source_doc}</td><td class="num">${w.facts}</td>
+     <td class="num flt">${w.floating}</td><td class="num">${w.anchored}</td></tr>`).join("");
+}
+async function reload(run){
+  try{const r=await fetch(run?"/api/run":"/api/data",{cache:"no-store"});render(await r.json());}
+  catch(e){render(FALLBACK);}
+}
+reload(false);
+</script>

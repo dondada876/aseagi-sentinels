@@ -1,0 +1,33 @@
+# Evidence-Integrity sentinel stack — measure -> match -> hunt, one board.
+#
+# DEPLOY TARGET:  137.184.1.91  (.91 — ASEAGI legal / Docling droplet)
+# DEPRECATED:     104.248.69.86 (.86) — DO NOT deploy here; being retired.
+#
+#   ssh root@137.184.1.91
+#   cd /opt/asi360/infra && docker compose -f warden/compose.yaml up -d --build
+#   open http://137.184.1.91:8090
+#
+# Build context is the parent (infra/) so the image carries all three sentinels.
+name: proj344
+services:
+  evidence-integrity:                    # sentinel: WARDEN (bundles PLUMB + TETHER + DOWSER)
+    build:
+      context: ..
+      dockerfile: warden/Dockerfile
+    container_name: proj344-warden
+    environment:
+      PORT: "8090"
+      DROPLET_HOST: "137.184.1.91"
+      # Flip the WHOLE stack OFFLINE->LIVE with one line (points every engine at the .91 lake):
+      # CORPUS_DSN: "postgres://reader:${READ_PW}@pg-duckdb-lake:5432/doc_lake"
+      # DATABASE_URL: "postgres://reader:${READ_PW}@pg-duckdb-lake:5432/doc_lake"
+      # TWIN_GLOB: "/data/twins/**/*.items.parquet"
+      # COMM_GLOB: "/data/comms/*.json"
+    ports:
+      - "8090:8090"       # combined board
+    volumes:
+      - ${DATA_DIR:-./sample_data}:/data:ro
+    restart: unless-stopped
+    # networks: [lakenet]   # uncomment to reach the pg-duckdb lake for LIVE mode
+# networks:
+#   lakenet: { external: true, name: pg-duckdb-lake_default }

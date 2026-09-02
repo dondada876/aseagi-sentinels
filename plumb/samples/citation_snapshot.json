@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-09-01",
+  "source": "canonical_facts (legal corpus jvjlhxodmbkodzmggwpu, read-only)",
+  "totals": { "facts": 564 },
+  "ladder": [
+    { "code": "L0_UNANCHORED",      "n": 46,  "pct": 8.2 },
+    { "code": "L1_QUOTED_FLOATING", "n": 354, "pct": 62.8 },
+    { "code": "L2_TWIN_LINKED",     "n": 91,  "pct": 16.1 },
+    { "code": "L3_LOCATED",         "n": 2,   "pct": 0.4 },
+    { "code": "L4_CERTIFIABLE",     "n": 71,  "pct": 12.6 }
+  ],
+  "cert_class": { "CERTIFIED": 105, "QUOTED_NO_LOCATOR": 256, "ASSERTED_NO_QUOTE": 78, "UNVERIFIED": 125 },
+  "coverage": { "has_verbatim": 480, "has_page_locator": 175, "has_twin_link": 164 },
+  "worst_docs": [
+    { "source_doc": "(no source_doc)", "facts": 24, "floating": 23, "anchored": 0 },
+    { "source_doc": "240522_D22-03244_FSOD_001 (digital twin, quality 960; 86 statements)", "facts": 12, "floating": 12, "anchored": 0 },
+    { "source_doc": "250626_Hearing_D22-03244_Voice_250626_133852.txt", "facts": 5, "floating": 5, "anchored": 0 },
+    { "source_doc": "240807_to_260209_Det_Ethan_Katz_RPD_SMS_Thread.md", "facts": 5, "floating": 5, "anchored": 0 },
+    { "source_doc": "Voice 250918_114823.txt", "facts": 3, "floating": 3, "anchored": 0 },
+    { "source_doc": "HEARING_TRANSCRIPT_SEP_9_2022", "facts": 2, "floating": 2, "anchored": 0 },
+    { "source_doc": "250416_Dr_Casey_Brown_Voice_Recording.txt", "facts": 2, "floating": 2, "anchored": 0 }
+  ]
+}

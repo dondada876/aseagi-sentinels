@@ -1,0 +1,6 @@
+__pycache__/
+*.jsonl
+dashboard_data.json
+combined_board.json
+*_report.json
+_standalone_proj344/

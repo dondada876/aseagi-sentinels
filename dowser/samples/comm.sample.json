@@ -1,0 +1,5 @@
+[
+  {"sender": "Mother", "recipient": "Don Bucknor", "message_text": "you can always come see your child, no problem", "sent_at": "2024-08-10T09:00:00Z", "thread_id": "custody_exchange", "message_hash": "syn_h1"},
+  {"sender": "Don Bucknor", "recipient": "Mother", "message_text": "There is a good cause report, please contact Inspector Rivera", "sent_at": "2024-08-13T10:00:00Z", "thread_id": "custody_exchange", "message_hash": "syn_h2"},
+  {"sender": "Mother", "recipient": "Don Bucknor", "message_text": "unrelated note about groceries", "sent_at": "2023-01-01T00:00:00Z", "thread_id": "misc", "message_hash": "syn_h3"}
+]

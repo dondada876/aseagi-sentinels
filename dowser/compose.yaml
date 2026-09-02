@@ -1,0 +1,23 @@
+# Independent Corroboration Gap Sentinel. Agnostic: mount any facts source + communication corpora.
+# Read-only on the corpus claim; writes PROPOSED gaps/candidates/requests to its own volume (and, in
+# LIVE mode, the evidence_gap / corroboration_candidate / evidence_request tables) - never canonical_facts.
+name: proj344
+services:
+  gap-sentinel:                          # sentinel: DOWSER
+    build: .
+    container_name: proj344-dowser
+    environment:
+      # Facts to analyse (one of):
+      # CORPUS_DSN: "postgres://reader:${READ_PW}@pg-duckdb-lake:5432/doc_lake"
+      FACTS_JSON: "/data/facts.json"
+      # Communication corpora to cross-reference (glob):
+      COMM_GLOB: "/data/comms/*.json"
+    volumes:
+      - ${DATA_DIR:-./samples}:/data:ro
+      - sentinel_out:/app
+    restart: "no"
+    # networks: [lakenet]
+volumes:
+  sentinel_out:
+# networks:
+#   lakenet: { external: true, name: pg-duckdb-lake_default }

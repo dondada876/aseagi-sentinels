@@ -1,0 +1,63 @@
+{
+  "platform": "aseagi-sentinels",
+  "division": "ASEAGI Sentinels — Athena, Guardian of Innocents",
+  "repo": "aseagi-sentinels",
+  "schema_version": "1.1",
+  "updated": "2026-09-01",
+  "deploy": { "active": "137.184.1.91", "deprecated": ["104.248.69.86"] },
+  "case_profiles": [
+    {
+      "id": "proj344", "case": "D22-03244", "status": "active", "added": "2026-09-01",
+      "corpus_project": "jvjlhxodmbkodzmggwpu",
+      "twin_glob": "twins/**/*.items.parquet",
+      "comm_glob": "*whatsapp*messages*.json",
+      "deploy_host": "137.184.1.91",
+      "note": "first case profile — family / juvenile / federal civil-rights"
+    }
+  ],
+  "sentinels": [
+    {
+      "id": "plumb", "name": "PLUMB", "role": "measure", "dir": "plumb",
+      "entry": "link_verify.py", "container": "proj344-plumb", "port": 8091,
+      "mode": "service", "status": "active", "version": "1.0.0", "added": "2026-09-01",
+      "verify": "python3 plumb/link_verify.py",
+      "summary": "Link-integrity ladder — how much of the corpus is cited to atomic truth."
+    },
+    {
+      "id": "tether", "name": "TETHER", "role": "match", "dir": "tether",
+      "entry": "reanchor.py", "container": "proj344-tether", "port": null,
+      "mode": "batch", "status": "active", "version": "1.0.0", "added": "2026-09-01",
+      "verify": "python3 tether/tests/dummy_reanchor_test.py",
+      "summary": "Matches each statement to its scanned source; resolves twin+page+grid."
+    },
+    {
+      "id": "dowser", "name": "DOWSER", "role": "hunt", "dir": "dowser",
+      "entry": "sentinel.py", "container": "proj344-dowser", "port": null,
+      "mode": "batch", "status": "active", "version": "1.0.0", "added": "2026-09-01",
+      "verify": "python3 dowser/tests/dummy_sentinel_test.py",
+      "summary": "Delta/gap analysis; hunts the missing document; corroborate or subpoena."
+    },
+    {
+      "id": "warden", "name": "WARDEN", "role": "orchestrate", "dir": "warden",
+      "entry": "orchestrate.py", "container": "proj344-warden", "port": 8090,
+      "mode": "service", "status": "active", "version": "1.0.0", "added": "2026-09-01",
+      "bundles": ["plumb", "tether", "dowser"],
+      "verify": "python3 warden/orchestrate.py",
+      "summary": "Runs PLUMB->TETHER->DOWSER; one combined board + action queue."
+    }
+  ],
+  "deprecations": [
+    {
+      "item": "host:104.248.69.86", "kind": "deploy-host",
+      "status": "deprecated", "deprecated_on": "2026-09-01",
+      "replaced_by": "137.184.1.91", "reason": "droplet retirement",
+      "remove_after": "2026-12-01"
+    }
+  ],
+  "lifecycle": {
+    "verify": "run verify_stack.sh (engine dummy tests + WARDEN integration + registry_check) — must pass before any merge or deploy",
+    "check_on_update": "on any sentinel change: bump its version, re-run verify_stack.sh, update this registry (entry/port/mode/status)",
+    "deprecate": "mark status=deprecated with deprecated_on + replaced_by + remove_after; keep a grace period, then remove the code and the entry",
+    "add_case_profile": "add an entry to case_profiles[] (id/case/corpus/twin_glob/comm_glob/deploy_host); sentinels are case-agnostic and serve every profile"
+  }
+}

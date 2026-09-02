@@ -1,0 +1,22 @@
+# Independent re-anchoring engine. Agnostic: mount any twin store + statements source.
+# Reads already-scanned twins read-only; writes PROPOSED anchors to its own volume (and, in
+# LIVE mode, to the statement_anchor table — never to canonical_facts).
+name: proj344
+services:
+  reanchor:                              # sentinel: TETHER
+    build: .
+    container_name: proj344-tether
+    environment:
+      TWIN_GLOB: "/data/twins/**/*.items.parquet"
+      # One of these selects the statements to anchor:
+      # STATEMENTS_JSON: "/data/statements.json"
+      # CORPUS_DSN: "postgres://reader:${READ_PW}@pg-duckdb-lake:5432/doc_lake"
+    volumes:
+      - ${TWIN_DIR:-./sample_data}:/data:ro     # already-scanned twins (read-only)
+      - reanchor_out:/app                        # findings + proposed anchors
+    restart: "no"
+    # networks: [lakenet]   # uncomment to reach the lake for LIVE mode
+volumes:
+  reanchor_out:
+# networks:
+#   lakenet: { external: true, name: pg-duckdb-lake_default }

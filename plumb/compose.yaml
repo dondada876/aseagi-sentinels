@@ -1,0 +1,21 @@
+# Independent citation-integrity engine + monitor.
+# Attaches to the existing pg-duckdb lake (read-only) for LIVE per-fact classification.
+# Run standalone (OFFLINE, uses the committed snapshot) or alongside the lake.
+name: proj344
+services:
+  citation-integrity:                    # sentinel: PLUMB
+    build: .
+    container_name: proj344-plumb
+    environment:
+      # Set to run LIVE against the corpus. Leave unset for OFFLINE (snapshot) mode.
+      # DATABASE_URL: postgres://reader:${READ_PW}@pg-duckdb-lake:5432/doc_lake
+      PORT: "8091"
+    ports:
+      - "8091:8091"
+    restart: unless-stopped
+    # Uncomment to co-locate with the lake network:
+    # networks: [lakenet]
+# networks:
+#   lakenet:
+#     external: true
+#     name: pg-duckdb-lake_default

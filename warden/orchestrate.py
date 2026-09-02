@@ -28,6 +28,15 @@ OUT = pathlib.Path(__file__).parent
 BOARD = OUT / "combined_board.json"
 FINDINGS = OUT / "combined_findings.jsonl"
 
+def _default_twin_glob():
+    """Find bundled twins in the standalone repo (INFRA/twins) or the real ones in the
+    monorepo (ROOT/twins) — whichever exists — so MATCH has data in either layout."""
+    for base in (INFRA, ROOT):
+        if (base / "twins").is_dir():
+            return str(base / "twins" / "**" / "*.items.parquet")
+    return str(ROOT / "twins/**/*.items.parquet")
+
+
 # name, cwd, entrypoint, per-engine env, report file, findings file
 ENGINES = [
     {"lane": "MEASURE", "name": "plumb",
@@ -36,7 +45,7 @@ ENGINES = [
     {"lane": "MATCH", "name": "tether",
      "cwd": INFRA / "tether", "entry": "reanchor.py",
      "report": "reanchor_report.json", "findings": "reanchor_findings.jsonl",
-     "env": {"TWIN_GLOB": os.environ.get("TWIN_GLOB", str(ROOT / "twins/**/*.items.parquet")),
+     "env": {"TWIN_GLOB": os.environ.get("TWIN_GLOB", _default_twin_glob()),
              "STATEMENTS_JSON": os.environ.get("STATEMENTS_JSON", str(INFRA / "tether/samples/statements.sample.json"))}},
     {"lane": "HUNT", "name": "dowser",
      "cwd": INFRA / "dowser", "entry": "sentinel.py",

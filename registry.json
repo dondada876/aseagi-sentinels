@@ -7,12 +7,20 @@
   "deploy": { "active": "137.184.1.91", "deprecated": ["104.248.69.86"] },
   "case_profiles": [
     {
+      "id": "demo", "case": "DEMO-0001", "status": "active", "added": "2026-09-01",
+      "corpus_project": "bundled-samples",
+      "twin_glob": "twins/**/*.items.parquet",
+      "comm_glob": "dowser/samples/comm.sample.json",
+      "deploy_host": "137.184.1.91",
+      "note": "synthetic bundled profile — a fresh clone runs green with a live MATCH lane, no external data"
+    },
+    {
       "id": "proj344", "case": "D22-03244", "status": "active", "added": "2026-09-01",
       "corpus_project": "jvjlhxodmbkodzmggwpu",
       "twin_glob": "twins/**/*.items.parquet",
       "comm_glob": "*whatsapp*messages*.json",
       "deploy_host": "137.184.1.91",
-      "note": "first case profile — family / juvenile / federal civil-rights"
+      "note": "first real case profile — family / juvenile / federal civil-rights"
     }
   ],
   "sentinels": [
